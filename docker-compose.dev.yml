@@ -1,0 +1,26 @@
+services:
+  demo-spring:
+    image: demo-spring:0.0.1-SNAPSHOT
+    container_name: demo-spring-app-dev
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - JWT_SECRET=devSecretKeyForDevelopmentOnlyWith32Characters
+      - JWT_EXPIRATION=86400000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200,http://localhost:8080
+    networks:
+      - demo-dev-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/public/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  demo-dev-network:
+    driver: bridge

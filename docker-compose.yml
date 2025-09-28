@@ -1,0 +1,80 @@
+services:
+  demo-spring:
+    image: demo-spring:latest
+    container_name: demo-spring-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/demo_spring_prod
+      - DATABASE_USERNAME=demo_user
+      - DATABASE_PASSWORD=demo_password
+      - JWT_SECRET=myProductionSecretKeyWith32Characters
+      - JWT_EXPIRATION=3600000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - demo-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/public/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: demo-spring-postgres
+    environment:
+      - POSTGRES_DB=demo_spring_prod
+      - POSTGRES_USER=demo_user
+      - POSTGRES_PASSWORD=demo_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - demo-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo_user -d demo_spring_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: demo-spring-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: demo-spring-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - demo-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  grafana_data:
+
+networks:
+  demo-network:
+    driver: bridge
