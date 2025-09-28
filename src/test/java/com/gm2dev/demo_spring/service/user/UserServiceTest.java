@@ -47,42 +47,42 @@ class UserServiceTest {
     @Test
     void getCurrentUser_ValidPrincipal_ReturnsUser() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByIdWithRoles(1L)).thenReturn(Optional.of(testUser));
 
         // When
         User result = userService.getCurrentUser(testUserPrincipal);
 
         // Then
         assertThat(result).isEqualTo(testUser);
-        verify(userRepository).findById(1L);
+        verify(userRepository).findByIdWithRoles(1L);
     }
 
     @Test
     void getUserById_ExistingId_ReturnsUser() {
         // Given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByIdWithRoles(userId)).thenReturn(Optional.of(testUser));
 
         // When
         User result = userService.getUserById(userId);
 
         // Then
         assertThat(result).isEqualTo(testUser);
-        verify(userRepository).findById(userId);
+        verify(userRepository).findByIdWithRoles(userId);
     }
 
     @Test
     void getUserById_NonExistingId_ThrowsResourceNotFoundException() {
         // Given
         Long userId = 999L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepository.findByIdWithRoles(userId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> userService.getUserById(userId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("User not found with id : '999'");
 
-        verify(userRepository).findById(userId);
+        verify(userRepository).findByIdWithRoles(userId);
     }
 
     @Test
@@ -118,7 +118,7 @@ class UserServiceTest {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(Collections.singletonList(testUser));
-        when(userRepository.findAll(pageable)).thenReturn(userPage);
+        when(userRepository.findAllWithRoles(pageable)).thenReturn(userPage);
 
         // When
         Page<User> result = userService.getAllUsers(pageable);
@@ -127,7 +127,7 @@ class UserServiceTest {
         assertThat(result).isEqualTo(userPage);
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0)).isEqualTo(testUser);
-        verify(userRepository).findAll(pageable);
+        verify(userRepository).findAllWithRoles(pageable);
     }
 
     @Test
@@ -216,13 +216,13 @@ class UserServiceTest {
     void deleteUser_ExistingUser_DeletesUser() {
         // Given
         Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByIdWithRoles(userId)).thenReturn(Optional.of(testUser));
 
         // When
         userService.deleteUser(userId);
 
         // Then
-        verify(userRepository).findById(userId);
+        verify(userRepository).findByIdWithRoles(userId);
         verify(userRepository).delete(testUser);
     }
 }

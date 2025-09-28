@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-@Profile("dev")
+@Profile({"dev", "test"})
 @RequiredArgsConstructor
 @Slf4j
 public class DataInitializer implements CommandLineRunner {

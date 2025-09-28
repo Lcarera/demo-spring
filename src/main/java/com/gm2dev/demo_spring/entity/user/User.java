@@ -56,9 +56,11 @@ public class User {
     private String lastName;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean enabled = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @Builder.Default
     @JoinTable(name = "user_roles",
                joinColumns = @JoinColumn(name = "user_id"),
                inverseJoinColumns = @JoinColumn(name = "role_id"))
