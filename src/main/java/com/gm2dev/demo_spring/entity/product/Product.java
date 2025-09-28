@@ -59,12 +59,4 @@ public class Product {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    public Product(String name, String description, BigDecimal price, Integer stockQuantity, String category) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.stockQuantity = stockQuantity;
-        this.category = category;
-    }
 }

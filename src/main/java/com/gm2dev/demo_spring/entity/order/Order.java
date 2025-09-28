@@ -75,22 +75,11 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public Order(User user, String shippingAddress) {
-        this.user = user;
-        this.shippingAddress = shippingAddress;
-        this.status = OrderStatus.PENDING;
-        this.orderItems = new ArrayList<>();
-    }
-
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
 
-    public void removeOrderItem(OrderItem orderItem) {
-        orderItems.remove(orderItem);
-        orderItem.setOrder(null);
-    }
 
     public BigDecimal calculateTotal() {
         return orderItems.stream()

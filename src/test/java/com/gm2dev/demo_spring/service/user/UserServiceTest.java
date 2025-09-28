@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -126,7 +125,7 @@ class UserServiceTest {
         // Then
         assertThat(result).isEqualTo(userPage);
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0)).isEqualTo(testUser);
+        assertThat(result.getContent().getFirst()).isEqualTo(testUser);
         verify(userRepository).findAllWithRoles(pageable);
     }
 
